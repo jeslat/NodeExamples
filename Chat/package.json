@@ -1,0 +1,10 @@
+{
+  "name": "chat-node",
+  "version": "1.0.0",
+  "description": "real time chat with node and socket.io",
+  "depencencies": {},
+  "dependencies": {
+    "express": "^4.13.1",
+    "socket.io": "^1.3.6"
+  }
+}

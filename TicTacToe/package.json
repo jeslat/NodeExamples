@@ -1,0 +1,10 @@
+{
+  "name": "Tic-tac-toe",
+  "version": "1.0.0",
+  "description": "Tic-tac-toe multiplayer",
+  "depencencies": {},
+  "dependencies": {
+    "express": "^4.13.1",
+    "socket.io": "^1.3.6"
+  }
+}

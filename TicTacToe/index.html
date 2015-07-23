@@ -1,0 +1,101 @@
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Tres en raya</title>
+    </head>
+    <style>
+        body { background-color:orange;}
+        h1 {text-align:center;}
+        h2 {text-align:center;}
+        div#board{width:310px;height:310px; padding:0px; border: 7px solid #999; background-color:white; margin: 20px auto; cursor:pointer;}
+        div#board div{width:100px;height:100px;float:left; margin:0px; font-size: 90px; text-align:center;}
+        div#cell0,div#cell1,div#cell2,div#cell3,div#cell4,div#cell5 {border-bottom: 5px solid black;}
+        div#cell0,div#cell1,div#cell3,div#cell4,div#cell6,div#cell7 {border-right: 5px solid black;}
+        div#board > div:hover {background-color:#ddd;}
+        div#console {width:310px;height:30px; padding:7px; border: 5px solid #999; background-color:white; margin: 10px auto; text-align:center; color:darkgreen;}
+    </style>
+    <body>
+        <h1>Tres En Raya</h1>
+        <h2 id="playerName"></h2>
+        <div id="board">
+            <div id="cell0" cell="0" class="cell"></div>
+            <div id="cell1" cell="1" class="cell"></div>
+            <div id="cell2" cell="2" class="cell"></div>
+            <div id="cell3" cell="3" class="cell"></div>
+            <div id="cell4" cell="4" class="cell"></div>
+            <div id="cell5" cell="5" class="cell"></div>
+            <div id="cell6" cell="6" class="cell"></div>
+            <div id="cell7" cell="7" class="cell"></div>
+            <div id="cell8" cell="8" class="cell"></div>
+        </div>
+        <div id="console"></div>
+
+        <script src="http://code.jquery.com/jquery-2.1.4.min.js"></script>
+        <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
+        <script>
+        var socket = io.connect('http://localhost:3000', {
+            'reconnect': false
+        });
+        var yourTurn = false;
+        var playerName;
+
+        socket.on('chat_message', function(msg) {
+            $('#console').html(msg);
+        });
+        socket.on('player_name', function(msg) {
+            playerName = msg;
+            $('#playerName').html("Player " + playerName);
+        });
+        socket.on('your_turn', function() {
+            yourTurn = true;
+            $('#console').html("Your turn");
+        });
+        socket.on("print_cell", function(name, number) {
+            console.log("Print cell: " + name + " - " + number);
+            var cell = $("#cell" + number);
+            cell.html(name);
+            if (name === playerName) {
+                cell.css("background-color", "red");
+            } else {
+                cell.css("background-color", "grey");
+            }
+        });
+        socket.on("tie", function() {
+            console.log("Tie");
+            $('#console').html("Tie!");
+            alert("Tie!");
+            finishGame();
+        });
+        socket.on("win", function(player) {
+            console.log("Win: " + player);
+            if (player === playerName) {
+                $('#console').html("You win!");
+                alert("You win!");
+            } else {
+                $('#console').html("You lost :(");
+                alert("You lost :(");
+            }
+            finishGame();
+        })
+
+        $(".cell").click(function () {
+            if (!yourTurn)
+                return;
+            yourTurn = false;
+            $('#console').html("His turn");
+            var number = $(this).attr("cell");
+            socket.emit("click_on_cell", playerName, number);
+        });
+
+        function finishGame() {
+            console.log("Finish game");
+            $('#console').html("");
+            for (var i = 0; i < 9; i++) {
+                var cell = $("#cell" + i);
+                cell.html("");
+                cell.css("background-color", "white");
+            }
+        }
+        </script>
+    </body>
+</html>
